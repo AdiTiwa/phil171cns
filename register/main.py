@@ -33,29 +33,43 @@ print('lexed and parsed file!')
 print('set your initial state with spaces between them (eg, $: 1 1 2 => R_0 = 1, R_1 = 1, R_2 = 2)')
 print('remember; R_0 IS the starting PC, or the index of the starting instruction (start counting at 1, those who know)')
 reg = list(map(int, input("$: ").split(" ")))
-reg = [*reg, *[0 for _ in range(OVERFLOW_LIMIT - len(reg))]] # initalize the rest of the registers to 0 (please work :prayer_hands:)
+# reg = [*reg, *[0 for _ in range(OVERFLOW_LIMIT - len(reg))]] # initalize the rest of the registers to 0 (please work :prayer_hands:)
 
-for itr in range(ITER_LIMIT):
+def inc(idx):
+    global reg
+    if idx > OVERFLOW_LIMIT:
+        print("error: you're overflowing somehow??")
+        return None
+    elif idx > len(reg):
+        reg = [*reg, *[0 for _ in range(len(reg) - idx)]]
+
+    reg[idx] += 1
+    return 0
+
+print("--")
+print("iter\t: registers")
+for itr in range(ITER_LIMIT): 
     try:
         instr = program[reg[0] - 1]
     except:
         print(f"program terminated at PC {reg[0]} at itr {itr}")
-        
-        last_nonzero = -1
-        for idx, val in enumerate(reg):
-            if val != 0:
-                last_nonzero = idx
-
-        print(f"registers: {reg[:last_nonzero + 1]}")
         break
     
+    print(f"{itr}\t: {" | ".join(map(str, reg))}")
+
     if instr[0] == "I":
-        reg[instr[1]] += 1
+        if type(inc(instr[1])) != int:
+            break
         reg[0] = instr[2]
 
     if instr[0] == "D":
-        if reg[instr[1]] > 0:
+        if instr[1] > OVERFLOW_LIMIT:
+            print("error: you're overflowing somehow??")
+            break
+        elif reg[instr[1]] > 0:
             reg[instr[1]] -= 1
             reg[0] = instr[2]
         else:
             reg[0] = instr[3]
+
+print(f"\t: {" | ".join(map(str, reg))}")
