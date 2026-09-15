@@ -12,6 +12,9 @@ program = []
 
 with open(filename, "r") as file:
     for line in file:
+        if not len(line.strip()) > 0:
+            continue
+
         instruction = line.strip().split(" ")
         instruction = (instruction[0], *map(int, instruction[1:]))
 
@@ -40,8 +43,8 @@ def inc(idx):
     if idx > OVERFLOW_LIMIT:
         print("error: you're overflowing somehow??")
         return None
-    elif idx > len(reg):
-        reg = [*reg, *[0 for _ in range(len(reg) - idx)]]
+    elif idx > len(reg) - 1:
+        reg = [*reg, *[0 for _ in range(len(reg) - idx + 1)]]
 
     reg[idx] += 1
     return 0
